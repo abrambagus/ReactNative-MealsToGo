@@ -21,7 +21,7 @@ export const loginRequest = (email, password) => {
         resolve(u);
       })
       .catch((e) => {
-        reject(e);
+        reject(e.code);
       }),
   ]);
 };

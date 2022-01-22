@@ -1,5 +1,10 @@
 import React, { createContext, useState } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 import { loginRequest } from "./authentication.service";
 
 export const AuthenticationContext = createContext();
@@ -24,6 +29,15 @@ export const AuthenticationContextProvider = ({ children }) => {
 
   const auth = getAuth();
 
+  onAuthStateChanged(auth, (usr) => {
+    if (usr) {
+      setUser(usr);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+    }
+  });
+
   const onRegister = (email, password, repeatedPassword) => {
     setIsLoading(true);
     if (password !== repeatedPassword) {
@@ -41,6 +55,16 @@ export const AuthenticationContextProvider = ({ children }) => {
       });
   };
 
+  const onLogout = () => {
+    signOut(auth)
+      .then(() => {
+        setUser(null);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <AuthenticationContext.Provider
       value={{
@@ -50,6 +74,7 @@ export const AuthenticationContextProvider = ({ children }) => {
         error,
         onLogin,
         onRegister,
+        onLogout,
       }}
     >
       {children}
